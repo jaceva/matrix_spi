@@ -26,13 +26,9 @@ while True:
     data = d_file.readline().strip()
 
   spi_data = main_data[data]
-  if speed_count == 0:
-    spi.xfer3(spi_data[frame])
-    frame += 1
-    if frame == len(spi_data):
-      print("RESET")
-      frame = 0
-  time.sleep(5)
+  spi.xfer3(spi_data[frame])
+  print("SPI")  
+  time.sleep(0.05)
 
 # TODO: Figure out SPI and WS2813 pio integration.
 
