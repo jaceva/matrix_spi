@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 from gpiozero import LED
+from os import listdir
 
 app = Flask(__name__)
 app.debug = True
@@ -17,12 +18,17 @@ def static_proxy(path):
 
 @app.route('/effect', methods = ['GET', 'POST'])
 def effect():
-  if request.method == "GET": 
-    return jsonify({"r": 0, "g": 0, "b": 0})
+  if request.method == "GET":
+    data_files = listdir("./data")
+    return jsonify(data_files)
   
   if request.method == "POST":
-    print(request.json)
-    
+    spi_data = request.json
+    print(spi_data)
+    with open('spi_file.txt', 'w') as s:
+      s.write(f"{spi_data['power']}\n")
+      s.write(f"{spi_data['speed']}\n")
+      s.write(f"{spi_data['file']}\n")
     return jsonify({'value': 200})
 
 # not needed in author
