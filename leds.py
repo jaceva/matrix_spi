@@ -5,9 +5,9 @@ import pickle
 from os import listdir
 
 main_data = {}
-data_files = listdir("./data")
+data_files = listdir("/home/pi/matrix_spi/data")
 for f in data_files:
-  with open(f"./data/{f}", 'rb') as pk_file:
+  with open(f"/home/pi/matrix_spi/data/{f}", 'rb') as pk_file:
     main_data[f] = pickle.load(pk_file)
 
 spi = spidev.SpiDev()
@@ -20,7 +20,7 @@ speed_count = 0
 frame = 0
 while True:
   spi_data = []
-  with open("spi_file.txt", "r") as d_file:
+  with open("/home/pi/matrix_spi/spi_file.txt", "r") as d_file:
     power = int(d_file.readline().strip())
     speed = int(d_file.readline().strip())
     data = d_file.readline().strip()
@@ -29,10 +29,3 @@ while True:
   spi.xfer3(spi_data[frame])
   print("SPI")  
   time.sleep(0.05)
-
-# TODO: Figure out SPI and WS2813 pio integration.
-
-# for i in range(len(spi_data)):
-#   if i%6 == 0:
-#     print()
-#   print(bin(spi_data[i]), end="")

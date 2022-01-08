@@ -19,12 +19,13 @@ def static_proxy(path):
 @app.route('/effect', methods = ['GET', 'POST'])
 def effect():
   if request.method == "GET":
-    data_files = listdir("./data")
+    data_files = listdir("/home/pi/matrix_spi/data")
     return jsonify(data_files)
   
   if request.method == "POST":
     spi_data = request.json
-    with open('spi_file.txt', 'w') as s:
+    print(spi_data)
+    with open('/home/pi/matrix_spi/spi_file.txt', 'w') as s:
       s.write(f"{spi_data['power']}\n")
       s.write(f"{spi_data['speed']}\n")
       s.write(f"{spi_data['file']}\n")
