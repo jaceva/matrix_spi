@@ -1,11 +1,16 @@
+import threading
 from flask import Flask, jsonify, request
 from os import listdir
 from c_leds import MatrixLEDs
 
 app = Flask(__name__)
-app.debug = True
+# app.debug = True
 
-ml = MatrixLEDs()
+lock = threading.Lock()
+ml = MatrixLEDs(lock=lock)
+
+led_thread = threading.Thread(name='leds', target=ml.run_spi)
+led_thread.start()
 
 @app.route('/')
 def root():
