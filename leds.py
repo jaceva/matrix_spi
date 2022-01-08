@@ -26,13 +26,6 @@ while True:
     data = d_file.readline().strip()
 
   spi_data = main_data[data]
-  spi.xfer3(spi_data[frame])
+  # spi.xfer3(spi_data[frame])
   print("SPI")  
   time.sleep(0.05)
-
-# TODO: Figure out SPI and WS2813 pio integration.
-
-# for i in range(len(spi_data)):
-#   if i%6 == 0:
-#     print()
-#   print(bin(spi_data[i]), end="")
