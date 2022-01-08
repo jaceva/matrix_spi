@@ -24,7 +24,6 @@ def effect():
   
   if request.method == "POST":
     spi_data = request.json
-    print(spi_data)
     with open('spi_file.txt', 'w') as s:
       s.write(f"{spi_data['power']}\n")
       s.write(f"{spi_data['speed']}\n")
