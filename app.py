@@ -1,12 +1,11 @@
 from flask import Flask, jsonify, request
-from gpiozero import LED
 from os import listdir
+from c_leds import MatrixLEDs
 
 app = Flask(__name__)
 app.debug = True
 
-led1 = LED(21)
-led1.on()
+ml = MatrixLEDs()
 
 @app.route('/')
 def root():
