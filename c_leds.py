@@ -28,26 +28,36 @@ class MatrixLEDs():
     self.spi.open(bus, device)
     self.spi.max_speed_hz = 5000000
 
+  def get_spi_data(self):
+    with self.lock:
+      with open("/home/pi/matrix_spi/spi_file.txt", "r") as d_file:
+        power = int(d_file.readline().strip())
+        speed = int(d_file.readline().strip())
+        data = d_file.readline().strip()
+
+    return power, speed, data
+
   def run_spi(self):
     print("SPI Running")
     spf = 0.05
     frame_count = 0
     data_index = 0
     spi_time = time.time()
+    power, speed, data = self.get_spi_data()
+    with self.lock:
+      self.spi.xfer3(self.main_data[data][0])
+      
     while True:
       if (time.time() - spi_time) > spf:
         spi_time = time.time()
         frame_count += 1
-
-        with open("/home/pi/matrix_spi/spi_file.txt", "r") as d_file:
-          power = int(d_file.readline().strip())
-          speed = int(d_file.readline().strip())
-          data = d_file.readline().strip()
-
+        
+        power, speed, data = self.get_spi_data()
+        print(data, speed)
         # print(f"{frame_count} - {data_index} - {len(self.main_data[data])}")
-        if (frame_count >= (11-speed)):
+        if len(self.main_data[data]) > 1 and (frame_count >= (11-speed)):
           
-          print(data, spi_time)
+          
           frame_count = 0
 
           with self.lock:

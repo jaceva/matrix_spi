@@ -29,10 +29,11 @@ def effect():
   if request.method == "POST":
     spi_data = request.json
     print(spi_data)
-    with open('/home/pi/matrix_spi/spi_file.txt', 'w') as s:
-      s.write(f"{spi_data['power']}\n")
-      s.write(f"{spi_data['speed']}\n")
-      s.write(f"{spi_data['file']}\n")
+    with lock:
+      with open('/home/pi/matrix_spi/spi_file.txt', 'w') as s:
+        s.write(f"{spi_data['power']}\n")
+        s.write(f"{spi_data['speed']}\n")
+        s.write(f"{spi_data['file']}\n")
     return jsonify({'value': 200})
 
 # not needed in author
