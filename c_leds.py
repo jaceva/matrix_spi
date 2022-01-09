@@ -53,7 +53,7 @@ class MatrixLEDs():
         frame_count += 1
         
         power, speed, data = self.get_spi_data()
-        print(data, speed)
+        print(data, speed, data_index)
         # print(f"{frame_count} - {data_index} - {len(self.main_data[data])}")
         if len(self.main_data[data]) > 1 and (frame_count >= (11-speed)):
           
