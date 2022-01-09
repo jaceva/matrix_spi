@@ -32,17 +32,25 @@ def get_spi_data(np_array):
   for i in range(int(len(bit_data)/4)):
     # Check this data. It looks maybe off in serial output.
     spi_index = 4*i
-    spi_data.append((bit_data[spi_index] | bit_data[spi_index+1] << 6) & 0xff)
+    spi_data.append(int(bit_data[spi_index] | bit_data[spi_index+1] << 6) & 0xff)
     spi_data.append(int((bit_data[spi_index+1] >> 2) | bit_data[spi_index+2] << 4) & 0xff)
     spi_data.append(int((bit_data[spi_index+2] >> 4) | bit_data[spi_index+3] << 2) & 0xff)
 
   return spi_data
 
 def write_spi_to_file(data):
-  with open("./data/im-white_mid_high", "wb") as pk_file:
+  with open("./data/white-pulse-slow", "wb") as pk_file:
     pickle.dump(data, pk_file)
 
+
+
+spi_data = []
 image1 = get_full_image()
-image1[:,:,:] = 192
-spi_data = get_spi_data(image1)
-# write_spi_to_file([spi_data])
+lvl = 0
+step = 8
+while lvl <= 255:
+  print(lvl)
+  image1[:,:,:] = lvl
+  lvl += step
+  spi_data.append(get_spi_data(image1))
+write_spi_to_file(spi_data)
