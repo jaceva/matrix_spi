@@ -35,9 +35,10 @@ if __name__ == "__main__":
   single_led[7::8,:,:] = 2
 
   start = time.time()
-  spi_data = bitmanip(single_led, control_shape=144)
+  spi_data = bitmanip(test2)
   print(time.time() - start)
-  # print(len(spi_data))
+  print(len(spi_data))
+  print(spi_data)
   # print_array(spi_data)
 
   # start = time.time()
