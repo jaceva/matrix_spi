@@ -8,9 +8,6 @@ app = Flask(__name__)
 
 lock = threading.Lock()
 ml = MatrixLEDs(lock=lock)
-
-# led_thread = threading.Thread(name='leds', target=ml.run_spi)
-# led_thread.start()
 ml.start_spi()
 
 @app.route('/')
@@ -37,8 +34,4 @@ def effect():
     print(spi_data)
     
     ml.set_data(spi_data["power"], spi_data["speed"], spi_data["file"])
-      # with open('/home/pi/matrix_spi/spi_file.txt', 'w') as s:
-      #   s.write(f"{spi_data['power']}\n")
-      #   s.write(f"{spi_data['speed']}\n")
-      #   s.write(f"{spi_data['file']}\n")
     return jsonify({'value': 200})

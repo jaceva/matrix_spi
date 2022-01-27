@@ -8,8 +8,10 @@ def bitmanip(a, control_shape=15552):
     a2 = np.rot90(a1[i:i+6], k=1, axes=(2,1))
     a3 = np.rot90(a2, k=1, axes=(0,2))
     a4 = np.reshape(a3, control_shape)
+    
 
     bits = np.concatenate((bits, a4), axis=0)
+  # print(np.packbits(bits).tolist())
   return np.packbits(bits)
 
 def print_array(a):
@@ -18,6 +20,27 @@ def print_array(a):
     if i != 0 and i % 144 == 0:
       print()
     print([d for d in ua[i:i+6]])
+
+def get_color_array(r=0, g=0, b=0):
+  color_array = np.zeros((36, 108, 3), dtype=np.ubyte)
+  color_array[:,:,0] = g
+  color_array[:,:,1] = r
+  color_array[:,:,2] = b
+
+
+  return color_array
+
+def get_vline_array(r1=0, g1=0, b1=0,
+                    r2=0, g2=0, b2=0,):
+  vline_array = np.zeros((36, 108, 3), dtype=np.ubyte)
+  vline_array[0::2,:,0] = b1
+  vline_array[0::2,:,1] = g1
+  vline_array[0::2,:,2] = r1
+  vline_array[1::2,:,0] = b2
+  vline_array[1::2,:,1] = g2
+  vline_array[1::2,:,2] = r2
+
+  return vline_array
 
 if __name__ == "__main__":
 
