@@ -81,7 +81,7 @@ class MatrixLEDs():
     spi_time = 0
 
     while True:
-      print(time.time() - spi_time)
+      # print(time.time() - spi_time)
       if (time.time() - spi_time) > spf:
         spi_time = time.time()
         if self.effect != self.prev_effect:
