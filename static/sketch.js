@@ -1,9 +1,11 @@
-let colorData;
+let effData;
+let rgbData;
 let powerButton;
 let speedSlide;
 let powerData = 1;
 let speedData = 5;
-let effect = 'white-mid';
+let effect;
+let effectName = "";
 let row = 90;
 
 
@@ -33,7 +35,7 @@ function makeEffectText() {
   textSize(32);
   text('Current Effect', 10, 30);
   textSize(24);
-  text(effect, 10, 60);
+  text(effectName, 10, 60);
 }
 
 function makeSlider() {
@@ -45,12 +47,13 @@ function makeSlider() {
 
 function makeButtons() {
   // let p = 40
-  for(let eff in colorData) {
+  for(let eff in effData) {
     console.log(eff)
-    b = createButton(colorData[eff]);
+    b = createButton(effData[eff]);
     b.position(10, row);
     b.mousePressed(() => {
-      effect = colorData[eff]
+      effect = eff;
+      effectName = effData[eff];
       postData()
     });
     row += 30;
@@ -58,13 +61,13 @@ function makeButtons() {
 }
 
 function postData() { 
-  httpPost("/effect", 'json', {'power': powerData, 'speed': speedData, 'file': effect});
+  console.log(effect);
+  httpPost("/effect", 'json', {'power': powerData, 'speed': speedData, 'effect': effect});
 }
 
 function getEffectList() {
   httpGet("/effects", "json", false, (x) => {
-    colorData = x;
-    console.log("GEL")
-    console.log(colorData);
+    effData = x['effects'];
+    console.log(effData);
   })
 }

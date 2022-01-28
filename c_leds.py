@@ -19,7 +19,7 @@ class MatrixLEDs():
     self.eff_green = 0
     self.eff_blue = 0
     self.effect = 'eff-white-col-right.npy'
-    self.prev_effect = 'blue'
+    self.prev_effect = ''
 
     self.effect_names = {}
 
@@ -42,7 +42,7 @@ class MatrixLEDs():
     
     for f in data_files:
       self.effect_names[f] = get_name(f[4:-4])
-      self.effect_data[f] = np.load(f"/home/pi/matrix_spi/data/{f}")
+      # self.effect_data[f] = np.load(f"/home/pi/matrix_spi/data/{f}")
 
         
 
@@ -101,7 +101,9 @@ class MatrixLEDs():
         spi_time = time.time()
         if self.effect != self.prev_effect:
           self.prev_effect = self.effect
-          effect_frames = self.effect_data[self.effect]
+          print("loading effect...", end="")
+          effect_frames =  np.load(f"/home/pi/matrix_spi/data/{self.effect}")
+          print("finished")
           frame_total = effect_frames.shape[0]
           refresh_count = 0
         if refresh_count >= (10-self.speed):
