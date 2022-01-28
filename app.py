@@ -21,8 +21,7 @@ def static_proxy(path):
 @app.route('/effects', methods = ['GET'])
 def effects():
   if request.method == "GET":
-    data_files = listdir("/home/pi/matrix_spi/data")
-    return jsonify(data_files)
+    return jsonify({"effects": ml.effect_names})
 
 @app.route('/effect', methods = ['GET', 'POST'])
 def effect():
@@ -33,5 +32,5 @@ def effect():
     spi_data = request.json
     print(spi_data)
     
-    ml.set_data(spi_data["power"], spi_data["speed"], spi_data["file"])
+    ml.set_data(spi_data["power"], spi_data["speed"], spi_data["effect"])
     return jsonify({'value': 200})

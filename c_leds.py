@@ -18,8 +18,14 @@ class MatrixLEDs():
     self.eff_red = 0
     self.eff_green = 0
     self.eff_blue = 0
-    self.effect = 'eff-white-col-right'
+    self.effect = 'eff-white-col-right.npy'
     self.prev_effect = 'blue'
+
+    self.effect_names = {}
+
+    
+    self.effect_data = {}
+    self.rgb_data = {}
     # whether data can be rgb controlled
     self.is_rgb = False
 
@@ -27,13 +33,18 @@ class MatrixLEDs():
     self.init_spi()
 
   def get_main_data(self):
+    def get_name(n):
+      n = n.replace("-", " ")
+      n = n.title()
+      return n
+
     data_files = listdir("/home/pi/matrix_spi/data")
     
     for f in data_files:
-      
-      if ".npy" not in f:
-        with open(f"/home/pi/matrix_spi/data/{f}", 'rb') as pk_file:
-          self.main_data[f] = pickle.load(pk_file)
+      self.effect_names[f] = get_name(f[4:-4])
+      self.effect_data[f] = np.load(f"/home/pi/matrix_spi/data/{f}")
+
+        
 
   def init_spi(self):
     print("SPI Init")
@@ -51,6 +62,10 @@ class MatrixLEDs():
     self.power = power
     self.speed = speed
     self.effect = effect
+    if effect[:3] == "eff":
+      self.is_rgb = False
+    elif effect[:3] == "rgb":
+      self.is_rgb = True
     self.eff_red = red
     self.eff_green = green
     self.eff_blue = blue
@@ -86,7 +101,7 @@ class MatrixLEDs():
         spi_time = time.time()
         if self.effect != self.prev_effect:
           self.prev_effect = self.effect
-          effect_frames = np.load(f"/home/pi/matrix_spi/data/{self.effect}.npy")
+          effect_frames = self.effect_data[self.effect]
           frame_total = effect_frames.shape[0]
           refresh_count = 0
         if refresh_count >= (10-self.speed):
