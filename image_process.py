@@ -1,6 +1,7 @@
 import ffmpeg
 import numpy as np
 import pickle
+import os
 
 # ffmepeg to covert images(gifs?) to the right size numpy array
 # TODO needs testing
@@ -17,18 +18,19 @@ def convert_image(image):
 def get_full_image():
   return np.zeros((1, 36, 108, 3), dtype=np.ubyte)
 
-def white_up(step):
+def white_up(name, step):
   if step > 0:
-    effect = np.zeros((1, 36, 108, 3), dtype=np.ubyte)
-    frame = get_full_image()
-    level = 0
-    while level <= 255:
-      frame[:,:,:] = level
-      level += step
-      effect = np.append(effect, frame, axis=0)
-    
-    effect = effect[1:]
-    return effect
+    data_files = os.listdir("/home/pi/matrix_spi/data")
+    if name not in data_files:
+      os.mkdir(f"/home/pi/matrix_spi/data/{name}")
+      frame = get_full_image()
+      level = 0
+      frame_number = 0
+      while level <= 255:
+        frame[:,:,:] = level
+        np.save(f"/home/pi/matrix_spi/data/{name}/{name}{str(frame_number)}", frame)
+        level += step
+        frame_number += 1
 
 def column_chase():
   effect = np.zeros((1, 36, 108, 3), dtype=np.ubyte)
@@ -41,12 +43,6 @@ def column_chase():
 
   effect = effect[1:]
   return effect
-
-
-
-    
-
-  return None
   
 
 if __name__ == "__main__":
@@ -54,9 +50,8 @@ if __name__ == "__main__":
   # e = white_pulse(10)
 
 
-  e = column_chase()
-  print(e.shape[0])
-  np.save("data/eff-white-col-right", e)
+  white_up("eff-white-up-med", 10)
+  
 
 
 
