@@ -37,10 +37,10 @@ class MatrixLEDs():
     # whether data can be rgb controlled
     self.is_rgb = False
 
-    self.get_main_data()
+    self.update_main_data()
     self.init_spi()
 
-  def get_main_data(self):
+  def update_main_data(self):
     def get_name(n):
       n = n.replace("-", " ")
       n = n.title()
