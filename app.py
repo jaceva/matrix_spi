@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 lock = threading.Lock()
 ml = MatrixLEDs(lock=lock)
-effect_data = {"power": 1, "speed": 5, "effect": "eff-white-up-slow", "new_effect": True}
+effect_data = {"power": 1, "speed": 5, "effect": "eff-white-up-slow"}
 ml.start_spi(effect_data)
 
 @app.route('/')
@@ -35,8 +35,6 @@ def effect():
     print(spi_data)
     effect_data["power"] = spi_data["power"] if "power" in spi_data else 1
     effect_data["speed"] = spi_data["speed"] if "speed" in spi_data else 5
-    effect_data["new_effect"] = True if "effect" in spi_data and spi_data["effect"] != effect_data["effect"] else False
     effect_data["effect"] = spi_data["effect"] if "effect" in spi_data and spi_data["effect"] != effect_data["effect"] else effect_data["effect"]
-    print(f"app.py: {effect_data['effect']}, new_effect: {effect_data['new_effect']}")
-    # ml.set_data(power=power, speed=speed, effect=effect)
+    
     return jsonify({'value': 200})

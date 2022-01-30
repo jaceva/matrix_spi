@@ -81,14 +81,11 @@ class MatrixLEDs():
     self.eff_blue = blue
 
   def start_spi(self, effect_data):
-    # spi_thread = Thread(name='spi_loop', target=self.run_spi)
-    # spi_thread.start()
-    new_effect = effect_data["new_effect"]
-    effect_data["new_effect"] = False
+    
     # next_frame = time.time()
     self.next_frame(power=effect_data["power"], speed=effect_data["speed"], 
-                    effect=effect_data["effect"], new_effect=new_effect)
-    # print(f"start: {effect_data['effect']} new_effect: {new_effect}")
+                    effect=effect_data["effect"])
+    
     if self.frame_thread is not None:
       self.frame_thread.cancel()
     self.frame_thread = Timer(self.seconds_per_refresh, self.start_spi, [effect_data])
@@ -97,21 +94,22 @@ class MatrixLEDs():
     
     
 
-  def next_frame(self, power=None, speed=None, effect=None, new_effect=False):
-    if new_effect:
+  def next_frame(self, power=None, speed=None, effect=None):
+    if effect != self.prev_effect:
+      self.prev_effect = effect
       print("New Effect")
       print(f"Loading {effect}")
       # self.prev_effect = self.effect
-      self.frames = listdir(f"/home/pi/matrix_spi/data/{effect}")
-      self.frames.sort(key=lambda file: int(file[-7:-4]))
-      self.total_frames = len(self.frames)
+      frames = listdir(f"/home/pi/matrix_spi/data/{effect}")
+      self.total_frames = len(frames)
       self.current_frame = 0
       self.refresh_count = 0
 
     if self.refresh_count >= (10-speed):
       self.refresh_count = 0
       # print(self.frames[self.current_frame])
-      effect_frame = np.load(f"/home/pi/matrix_spi/data/{effect}/{self.frames[self.current_frame]}") 
+      filename = effect + str(self.current_frame).zfill(3) + ".npy"
+      effect_frame = np.load(f"/home/pi/matrix_spi/data/{effect}/{filename}") 
       # print(effect_frame)   
       manip_data = bitmanip(effect_frame)
 

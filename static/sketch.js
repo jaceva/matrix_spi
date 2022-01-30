@@ -4,8 +4,8 @@ let powerButton;
 let speedSlide;
 let powerData = 1;
 let speedData = 5;
-let effect;
-let effectName = "";
+let effect = "eff-white-up-slow";
+let effectName = "White Up Slow";
 let row = 90;
 
 
