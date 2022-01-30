@@ -31,6 +31,9 @@ def effect():
   if request.method == "POST":
     spi_data = request.json
     print(spi_data)
+    ml.power = spi_data["power"] if "power" in spi_data else 1
+    ml.speed = spi_data["speed"] if "speed" in spi_data else 5
+    ml.effect = spi_data["effect"] if "effect" in spi_data else ml.effect
     
-    ml.set_data(spi_data["power"], spi_data["speed"], spi_data["effect"])
+    # ml.set_data(power=power, speed=speed, effect=effect)
     return jsonify({'value': 200})

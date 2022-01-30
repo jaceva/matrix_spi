@@ -16,7 +16,7 @@ def convert_image(image):
   
 
 def get_full_image():
-  return np.zeros((1, 36, 108, 3), dtype=np.ubyte)
+  return np.zeros((36, 108, 3), dtype=np.ubyte)
 
 def white_up(name, step):
   if step > 0:
@@ -28,7 +28,7 @@ def white_up(name, step):
       frame_number = 0
       while level <= 255:
         frame[:,:,:] = level
-        np.save(f"/home/pi/matrix_spi/data/{name}/{name}{str(frame_number)}", frame)
+        np.save(f"/home/pi/matrix_spi/data/{name}/{name}{str(frame_number).zfill(3)}", frame)
         level += step
         frame_number += 1
 
@@ -50,7 +50,7 @@ if __name__ == "__main__":
   # e = white_pulse(10)
 
 
-  white_up("eff-white-up-med", 10)
+  white_up("eff-white-up-fast", 25)
   
 
 
