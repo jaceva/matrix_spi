@@ -84,7 +84,8 @@ class MatrixLEDs():
     
     # next_frame = time.time()
     self.next_frame(power=effect_data["power"], speed=effect_data["speed"], 
-                    effect=effect_data["effect"])
+                    effect=effect_data["effect"], main_level=effect_data["main"],
+                    fg_color= effect_data["fg_color"], bg_color= effect_data["bg_color"], )
     
     if self.frame_thread is not None:
       self.frame_thread.cancel()
@@ -94,7 +95,10 @@ class MatrixLEDs():
     
     
 
-  def next_frame(self, power=None, speed=None, effect=None):
+  def next_frame(self, power=None, speed=None, 
+                effect=None, main_level=None,
+                fg_color = None, bg_color=None):
+
     if effect != self.prev_effect:
       self.prev_effect = effect
       print("New Effect")
@@ -106,10 +110,16 @@ class MatrixLEDs():
       self.refresh_count = 0
 
     if self.refresh_count >= (10-speed):
+      print(main_level)
       self.refresh_count = 0
       # print(self.frames[self.current_frame])
       filename = effect + str(self.current_frame).zfill(3) + ".npy"
-      effect_frame = np.load(f"/home/pi/matrix_spi/data/{effect}/{filename}") 
+      effect_frame = np.load(f"/home/pi/matrix_spi/data/{effect}/{filename}")
+      effect_frame[:,:,0] = (effect_frame[:,:,0] * fg_color["g"]).astype(np.uint8)
+      effect_frame[:,:,1] = (effect_frame[:,:,1] * fg_color["r"]).astype(np.uint8)
+      effect_frame[:,:,2] = (effect_frame[:,:,2] * fg_color["b"]).astype(np.uint8)
+      level_divider = 1/main_level if main_level > 0 else 255
+      effect_frame = (effect_frame//level_divider).astype(np.uint8)
       # print(effect_frame)
       manip_data = bitmanip(effect_frame)
       self.cs_pin.off()
@@ -194,5 +204,5 @@ class MatrixLEDs():
         
 if __name__ == "__main__":
   test_matrix = MatrixLEDs()
-  test_matrix.start_spi({"power": 1, "speed": 10, "effect": "eff-white-up-slow"})
+  test_matrix.start_spi({"power": 1, "speed": 10, "effect": "eff-white-up-fast", "main": 0.01})
   test_matrix.effect_names
