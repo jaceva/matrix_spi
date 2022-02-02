@@ -8,7 +8,10 @@ app = Flask(__name__)
 
 lock = threading.Lock()
 ml = MatrixLEDs(lock=lock)
-effect_data = {"power": 1, "speed": 5, "effect": "eff-white-up-slow", 'main': 100}
+effect_data = {"power": 1, "speed": 5, 
+              "effect": "eff-white-up-slow", 'main': 1, 
+              "fg_color": {"r": 255, "g": 255, "b": 255},
+              "bg_color": {"r": 255, "g": 255, "b": 255},}
 ml.start_spi(effect_data)
 
 @app.route('/')
@@ -34,8 +37,12 @@ def effect():
   if request.method == "POST":
     spi_data = request.json
     print(spi_data)
-    effect_data["power"] = spi_data["power"] if "power" in spi_data else 1
-    effect_data["speed"] = spi_data["speed"] if "speed" in spi_data else 5
+    effect_data["power"] = spi_data["power"] if "power" in spi_data else effect_data["power"]
+    effect_data["speed"] = spi_data["speed"] if "speed" in spi_data else effect_data["speed"]
     effect_data["effect"] = spi_data["effect"] if "effect" in spi_data and spi_data["effect"] != effect_data["effect"] else effect_data["effect"]
-    
+    effect_data["main"] = spi_data["main"]/100 if "main" in spi_data else effect_data["main"]
+    effect_data["fg_color"] = spi_data["fg_color"] if "fg_color" in spi_data else effect_data["fg_color"]
+    effect_data["bg_color"] = spi_data["bg_color"] if "bg_color" in spi_data else effect_data["bg_color"]
+
+
     return jsonify({'value': 200})

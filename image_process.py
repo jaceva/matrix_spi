@@ -15,8 +15,8 @@ def convert_image(image):
     print(e)
   
 
-def get_full_image():
-  return np.zeros((36, 108, 3), dtype=np.ubyte)
+def get_full_image(dt=np.uint8):
+  return np.zeros((36, 108, 3), dtype=dt)
 
 def white_up(name, step):
   if step > 0:
@@ -46,28 +46,30 @@ def column_chase():
 
 def pulse(step):
   level = 0
-  frame = get_full_image()
-  while level <= 100:
+  frame = get_full_image(dt=np.half)
+  while level <= 1:
     frame[:,:,:] = level
-    level = round(level + step, 2)
+    level = level + step
     yield frame
 
-  level = 100.0
+  level = 1.0
   step *= -1
   while level >= 0:
-    level = round(level + step, 2)
+    level = level + step
     frame[:,:,:] = level
     yield frame
 
 
 def create_rgb(name, steps_to_max, effect_function):
   data_files = os.listdir("/home/pi/matrix_spi/data")
-  if name not in data_files:
-    rgb_dir = f"/home/pi/matrix_spi/data/{name}"
+  rgb_name = f"rgb-{name}"
+  if rgb_name not in data_files:
+    rgb_dir = f"/home/pi/matrix_spi/data/{rgb_name}"
     os.mkdir(rgb_dir)
-    step = round(100/steps_to_max, 3)
+    step = 1/steps_to_max
     for i, frame in enumerate(pulse(step)):
-      np.save(f"/home/pi/matrix_spi/data/{name}/{name}{str(i).zfill(3)}", frame)
+      np.save(f"/home/pi/matrix_spi/data/{rgb_name}/{rgb_name}{str(i).zfill(3)}", frame)
+      print(frame)
   else:
     print("Name already in directory.") 
  
@@ -75,9 +77,8 @@ def create_rgb(name, steps_to_max, effect_function):
 if __name__ == "__main__":
   # convert_image('sparkle.gif')
   # e = white_pulse(10)
-
-
   # white_up("eff-white-up-fast", 25)
+  create_rgb("pulse-slow", 255, pulse)
   
 
 
