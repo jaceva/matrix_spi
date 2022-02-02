@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 lock = threading.Lock()
 ml = MatrixLEDs(lock=lock)
-effect_data = {"power": 1, "speed": 5, "effect": "eff-white-up-slow"}
+effect_data = {"power": 1, "speed": 5, "effect": "eff-white-up-slow", 'main': 100}
 ml.start_spi(effect_data)
 
 @app.route('/')

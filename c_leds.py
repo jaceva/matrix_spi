@@ -110,11 +110,12 @@ class MatrixLEDs():
       # print(self.frames[self.current_frame])
       filename = effect + str(self.current_frame).zfill(3) + ".npy"
       effect_frame = np.load(f"/home/pi/matrix_spi/data/{effect}/{filename}") 
-      # print(effect_frame)   
+      # print(effect_frame)
       manip_data = bitmanip(effect_frame)
-
+      self.cs_pin.off()
+      time.sleep(0.0001)
       self.spi.writebytes2(manip_data)
-
+      self.cs_pin.on()
       # print(self.current_frame)
       self.current_frame += 1
       if self.current_frame == self.total_frames:
@@ -122,76 +123,76 @@ class MatrixLEDs():
 
     self.refresh_count += 1
 
-  def run_spi(self):
+  # def run_spi(self):
     
-    print("SPI Running")
+  #   print("SPI Running")
 
-
-    
-    frame_total = 0   # frames in effect 
-    frame_count = 0   # counter for frames
-
-    refresh_count = 0
-
-    # seconds per frame
-    spf = 0.05
 
     
-    white_level = 0
-    step = -5
+  #   frame_total = 0   # frames in effect 
+  #   frame_count = 0   # counter for frames
+
+  #   refresh_count = 0
+
+  #   # seconds per frame
+  #   spf = 0.05
+
     
-    manip_time = 0
-    spi_time = 0
+  #   white_level = 0
+  #   step = -5
+    
+  #   manip_time = 0
+  #   spi_time = 0
 
-    while True:
-      # print(time.time() - spi_time)
-      if (time.time() - spi_time) > spf:
-        spi_time = time.time()
-        if self.effect != self.prev_effect:
-          self.prev_effect = self.effect
-          frames = listdir(f"/home/pi/matrix_spi/data/{self.effect}")
-          frames.sort(key=lambda file: int(file[-7:-4]))
-          frame_count = 0
-          refresh_count = 0
-          frame_total = len(frames)
-          print(frames)
-          print(frame_total)
+  #   while True:
+  #     # print(time.time() - spi_time)
+  #     if (time.time() - spi_time) > spf:
+  #       spi_time = time.time()
+  #       if self.effect != self.prev_effect:
+  #         self.prev_effect = self.effect
+  #         frames = listdir(f"/home/pi/matrix_spi/data/{self.effect}")
+  #         frames.sort(key=lambda file: int(file[-7:-4]))
+  #         frame_count = 0
+  #         refresh_count = 0
+  #         frame_total = len(frames)
+  #         print(frames)
+  #         print(frame_total)
 
-        if refresh_count >= (10-self.speed):
-          refresh_count = 0
-          with self.lock:
+  #       if refresh_count >= (10-self.speed):
+  #         refresh_count = 0
+  #         with self.lock:
             
-            # manip_time = time.time()
-            # print(frames[frame_count])
-            effect_frame = np.load(f"/home/pi/matrix_spi/data/{self.effect}/{frames[frame_count]}")
+  #           # manip_time = time.time()
+  #           # print(frames[frame_count])
+  #           effect_frame = np.load(f"/home/pi/matrix_spi/data/{self.effect}/{frames[frame_count]}")
             
-            manip_data = bitmanip(effect_frame)
+  #           manip_data = bitmanip(effect_frame)
             
-            # print(manip_data.shape)
-            # manip_data = bitmanip(get_color_array(r=0, g=0, b=white_level))
-            # print(time.time() - manip_time)
+  #           # print(manip_data.shape)
+  #           # manip_data = bitmanip(get_color_array(r=0, g=0, b=white_level))
+  #           # print(time.time() - manip_time)
             
-            # self.cs_pin.off()
-            send_time = time.time()
-            self.spi.writebytes2(manip_data)
-            send_time = time.time() - send_time
-            # print(send_time)
-            # self.cs_pin.on()
+  #           # self.cs_pin.off()
+  #           send_time = time.time()
+  #           self.spi.writebytes2(manip_data)
+  #           send_time = time.time() - send_time
+  #           # print(send_time)
+  #           # self.cs_pin.on()
 
-            # next effect frame
-            frame_count += 1
-            if frame_count == frame_total:
-              frame_count = 0
+  #           # next effect frame
+  #           frame_count += 1
+  #           if frame_count == frame_total:
+  #             frame_count = 0
 
-        # effect speed count
-        refresh_count += 1
+  #       # effect speed count
+  #       refresh_count += 1
         
-        # if white_level == 255 or white_level == 0:
-        #   step *= -1
+  #       # if white_level == 255 or white_level == 0:
+  #       #   step *= -1
 
-        # white_level += step
+  #       # white_level += step
         
 if __name__ == "__main__":
   test_matrix = MatrixLEDs()
-  test_matrix.start_spi()
+  test_matrix.start_spi({"power": 1, "speed": 10, "effect": "eff-white-up-slow"})
   test_matrix.effect_names

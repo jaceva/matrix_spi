@@ -7,6 +7,7 @@ let speedData = 5;
 let effect = "eff-white-up-slow";
 let effectName = "White Up Slow";
 let row = 90;
+let mainLevel = 100;
 
 
 function setup() {
@@ -62,7 +63,7 @@ function makeButtons() {
 
 function postData() { 
   console.log(effect);
-  httpPost("/effect", 'json', {'power': powerData, 'speed': speedData, 'effect': effect});
+  httpPost("/effect", 'json', {'power': powerData, 'speed': speedData, 'effect': effect, 'main': mainLevel});
 }
 
 function getEffectList() {

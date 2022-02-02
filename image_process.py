@@ -43,14 +43,41 @@ def column_chase():
 
   effect = effect[1:]
   return effect
-  
+
+def pulse(step):
+  level = 0
+  frame = get_full_image()
+  while level <= 100:
+    frame[:,:,:] = level
+    level = round(level + step, 2)
+    yield frame
+
+  level = 100.0
+  step *= -1
+  while level >= 0:
+    level = round(level + step, 2)
+    frame[:,:,:] = level
+    yield frame
+
+
+def create_rgb(name, steps_to_max, effect_function):
+  data_files = os.listdir("/home/pi/matrix_spi/data")
+  if name not in data_files:
+    rgb_dir = f"/home/pi/matrix_spi/data/{name}"
+    os.mkdir(rgb_dir)
+    step = round(100/steps_to_max, 3)
+    for i, frame in enumerate(pulse(step)):
+      np.save(f"/home/pi/matrix_spi/data/{name}/{name}{str(i).zfill(3)}", frame)
+  else:
+    print("Name already in directory.") 
+ 
 
 if __name__ == "__main__":
   # convert_image('sparkle.gif')
   # e = white_pulse(10)
 
 
-  white_up("eff-white-up-fast", 25)
+  # white_up("eff-white-up-fast", 25)
   
 
 
