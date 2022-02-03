@@ -9,7 +9,7 @@ app = Flask(__name__)
 lock = threading.Lock()
 ml = MatrixLEDs(lock=lock)
 effect_data = {"power": 1, "speed": 5, 
-              "effect": "eff-white-up-slow", 'main': 1, 
+              "effect": "rgb-pulse-slow", 'main': 1, 
               "fg_color": {"r": 255, "g": 255, "b": 255},
               "bg_color": {"r": 255, "g": 255, "b": 255},}
 ml.start_spi(effect_data)

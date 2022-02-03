@@ -5,8 +5,8 @@ let mainSlide;
 let speedSlide;
 let powerData = 1;
 let speedData = 5;
-let effect = "eff-white-up-slow";
-let effectName = "White Up Slow";
+let effect = "rgb-pulse-slow";
+let effectName = "Pulse Slow";
 let row = 90;
 let mainLevel = 100;
 let toPost = false;
@@ -36,13 +36,11 @@ function draw(){
   background('white');
   fill('black')
   makeEffectText();
-  fgColor = fgColorPicker.color();
+  if(fgColor != fgColorPicker.color()) {
+    fgColor = fgColorPicker.color();
+    toPost = true;
+  }
   bgColor = bgColorPicker.color();
-  fill(fgColor);
-  square(350, 80, 100, 25);
-
-  fill(bgColor);
-  square(475, 80, 100, 25);
 
   let newMain = mainSlide.value();
   if (newMain !== mainLevel) {
@@ -82,13 +80,15 @@ function makeSpeedSlider() {
 
 function makeFGColorPicker() {
   fgColorPicker = createColorPicker(fgColor);
-  fgColorPicker.position(358, 190);
+  fgColorPicker.position(358, 80);
+  fgColorPicker.style('height', '100px');
   fgColorPicker.style('width', '100px');
 }
 
 function makeBGColorPicker() {
   bgColorPicker = createColorPicker(bgColor);
-  bgColorPicker.position(483, 190);
+  bgColorPicker.position(483, 80);
+  bgColorPicker.style('height', '100px');
   bgColorPicker.style('width', '100px');
 }
 
