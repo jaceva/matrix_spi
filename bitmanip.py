@@ -5,7 +5,9 @@ def bitmanip(a, control_shape=15552):
   bits = np.array([], dtype=np.uint8)
   a1 = np.unpackbits(a, axis=2)
   for i in range(0, 36, 6):
-    a2 = np.rot90(a1[i:i+6], k=1, axes=(2,1))
+    
+    a1_5 = np.flip(a1[i:i+6], 0)
+    a2 = np.rot90(a1_5, k=1, axes=(2,1))
     a3 = np.rot90(a2, k=1, axes=(0,2))
     a4 = np.reshape(a3, control_shape)
     
