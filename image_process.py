@@ -26,7 +26,7 @@ def white_up(name, step):
       frame = get_full_image()
       level = 0
       frame_number = 0
-      while level <= 255:
+      while level <= 256:
         frame[:,:,:] = level
         np.save(f"/home/pi/matrix_spi/data/{name}/{name}{str(frame_number).zfill(3)}", frame)
         level += step
@@ -59,7 +59,6 @@ def pulse(step):
     frame[:,:,:] = level
     yield frame
 
-
 def create_rgb(name, steps_to_max, effect_function):
   data_files = os.listdir("/home/pi/matrix_spi/data")
   rgb_name = f"rgb-{name}"
@@ -69,24 +68,60 @@ def create_rgb(name, steps_to_max, effect_function):
     step = 1/steps_to_max
     for i, frame in enumerate(pulse(step)):
       np.save(f"/home/pi/matrix_spi/data/{rgb_name}/{rgb_name}{str(i).zfill(3)}", frame)
-      print(frame)
   else:
     print("Name already in directory.") 
  
+def test_frame():
+  pattern_name = "rgb-test-scroll"
+  os.mkdir(f"/home/pi/matrix_spi/data/{pattern_name}")
+  frame = get_full_image(dt=np.half)
+  # green
+  for j in range(6):
+    frame[0*6+j, 0:j+1, 0] = 1
+    frame[0*6+j, -1-j:, 0] = 1
+    
+  # red
+  for j in range(6):
+    frame[1*6+j, 0:j+2, 1] = 1
+    frame[1*6+j, -2-j:, 1] = 1
+    
+  # blue
+  for j in range(6):
+    frame[2*6+j, 0:j+3, 2] = 1
+    frame[2*6+j, -3-j:, 2] = 1
+    
+  # yellow
+  for j in range(6):
+    frame[3*6+j, 0:j+4, 0] = 1
+    frame[3*6+j, 0:j+4, 1] = 1
+    frame[3*6+j, -4-j:, 0] = 1
+    frame[3*6+j, -4-j:, 1] = 1
+    
+  # cyan
+  for j in range(6):
+    frame[4*6+j, 0:j+5, 0] = 1
+    frame[4*6+j, 0:j+5, 2] = 1
+    frame[4*6+j, -5-j:, 0] = 1
+    frame[4*6+j, -5-j:, 2] = 1
+    
+  # magenta
+  for j in range(6):
+    frame[5*6+j, 0:j+6, 1] = 1
+    frame[5*6+j, 0:j+6, 2] = 1
+    frame[5*6+j, -6-j:, 1] = 1
+    frame[5*6+j, -6-j:, 2] = 1
+
+  for k in range(86):
+    frame[:,k+11,:] = 1
+    np.save(f"/home/pi/matrix_spi/data/{pattern_name}/{pattern_name}{str(k).zfill(3)}", frame)
+
+    
+
 
 if __name__ == "__main__":
   # convert_image('sparkle.gif')
   # e = white_pulse(10)
   # white_up("eff-white-up-fast", 25)
-  create_rgb("pulse-slow", 255, pulse)
+  # create_rgb("pulse-med", 64, pulse)
+  test_frame()
   
-
-
-
-# image1 = get_full_image()
-# lvl = 0
-# step = 8
-# while lvl <= 255:
-#   print(lvl)
-#   image1[:,:,:] = lvl
-#   lvl += step
