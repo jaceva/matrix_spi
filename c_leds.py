@@ -22,7 +22,7 @@ class MatrixLEDs():
     self.prev_effect = ''
 
     # next frame vars
-    self.seconds_per_refresh = 0.02
+    self.seconds_per_refresh = 0.030
     self.frames = []
     self.current_frame = 0
     self.refresh_count = 0
@@ -48,8 +48,9 @@ class MatrixLEDs():
 
     data_files = listdir("/home/pi/matrix_spi/data")
     
+    file_types = ["eff", "rgb", "txt"]
     for f in data_files:
-      if f[:3] == "eff" or f[:3] == "rgb":
+      if f[:3] in file_types:
         self.effect_names[f] = get_name(f[4:])
     
 
@@ -62,7 +63,7 @@ class MatrixLEDs():
     self.cs_pin = LED(5)
     self.cs_pin.on()
     self.spi.open(bus, device)
-    self.spi.max_speed_hz = 4000000
+    self.spi.max_speed_hz = 2000000
 
   def set_data(self, power=1, speed=5, effect=None,
                 red=0, green=0, blue=0):

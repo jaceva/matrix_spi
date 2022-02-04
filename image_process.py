@@ -139,8 +139,12 @@ def create_text_scroll(name, text, height, top, font_name="arial.ttf"):
     text_image = Image.new("RGB", (216+text_length, 36))
     draw_image = ImageDraw.Draw(text_image)
     draw_image.text((108, top), text, font=font, fill=(255, 255, 255,))
+    text_image.convert("1")
     text_array = np.array(text_image)
-    text_image.save(f"/home/pi/matrix_spi/data/{txt_name}/{txt_name}.jpg")
+    text_array[text_array==255] = 1
+    # text_array[text_array==0] = -1 
+    # print(temp_array[:,110,:])
+    # text_image.save(f"/home/pi/matrix_spi/data/{txt_name}/{txt_name}.jpg")
     frame_total = text_array.shape[1] - 107
     for f in range(frame_total):
       np.save(f"/home/pi/matrix_spi/data/{txt_name}/{txt_name}{str(f).zfill(3)}", text_array[:,f:108+f,:])    
