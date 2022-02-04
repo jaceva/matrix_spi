@@ -1,7 +1,13 @@
+from PIL import Image, ImageDraw, ImageFont
 import ffmpeg
 import numpy as np
 import pickle
 import os
+import pwd
+import grp
+
+uid = pwd.getpwnam("pi").pw_uid
+gid = grp.getgrnam("www-data").gr_gid
 
 # ffmepeg to covert images(gifs?) to the right size numpy array
 # TODO needs testing
@@ -115,7 +121,29 @@ def test_frame():
     frame[:,k+11,:] = 1
     np.save(f"/home/pi/matrix_spi/data/{pattern_name}/{pattern_name}{str(k).zfill(3)}", frame)
 
-    
+def create_text_scroll(name, text, height, top, font_name="arial.ttf"):
+  data_files = os.listdir("/home/pi/matrix_spi/data")
+  txt_name = f"txt-{name}"
+  if txt_name not in data_files:
+    txt_dir = f"/home/pi/matrix_spi/data/{txt_name}"
+    os.mkdir(txt_dir)
+    os.chown(txt_dir, uid, gid)
+    font_size = 1
+    text_length = None
+    font = ImageFont.truetype(font_name, font_size)
+    while font.getsize(text)[1] < height: 
+      font_size += 1
+      font = ImageFont.truetype(font_name, font_size)
+
+    text_length = font.getsize(text)[0]
+    text_image = Image.new("RGB", (216+text_length, 36))
+    draw_image = ImageDraw.Draw(text_image)
+    draw_image.text((108, top), text, font=font, fill=(255, 255, 255,))
+    text_array = np.array(text_image)
+    text_image.save(f"/home/pi/matrix_spi/data/{txt_name}/{txt_name}.jpg")
+    frame_total = text_array.shape[1] - 107
+    for f in range(frame_total):
+      np.save(f"/home/pi/matrix_spi/data/{txt_name}/{txt_name}{str(f).zfill(3)}", text_array[:,f:108+f,:])    
 
 
 if __name__ == "__main__":

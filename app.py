@@ -2,6 +2,7 @@ import threading
 from flask import Flask, jsonify, request
 from os import listdir
 from c_leds import MatrixLEDs
+from image_process import create_text_scroll
 
 app = Flask(__name__)
 # app.debug = True
@@ -36,7 +37,7 @@ def effect():
   
   if request.method == "POST":
     spi_data = request.json
-    print(spi_data)
+    # print(spi_data)
     effect_data["power"] = spi_data["power"] if "power" in spi_data else effect_data["power"]
     effect_data["speed"] = spi_data["speed"] if "speed" in spi_data else effect_data["speed"]
     effect_data["effect"] = spi_data["effect"] if "effect" in spi_data and spi_data["effect"] != effect_data["effect"] else effect_data["effect"]
@@ -46,3 +47,19 @@ def effect():
 
 
     return jsonify({'value': 200})
+
+@app.route('/textscroll', methods = ['GET', 'POST'])
+def textscroll():
+  if request.method == "GET":
+    return jsonify({"status": 200})
+  
+  if request.method == "POST":
+    text_data = request.json
+    create_text_scroll(text_data["name"],
+                      text_data["scrollText"],
+                      int(text_data["height"]),
+                      int(text_data["top"]),
+                      text_data["font"]
+    )
+    
+    return jsonify({"status": 200})

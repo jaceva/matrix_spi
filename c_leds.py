@@ -110,7 +110,6 @@ class MatrixLEDs():
       self.refresh_count = 0
 
     if self.refresh_count >= (10-speed):
-      print(main_level)
       self.refresh_count = 0
       # print(self.frames[self.current_frame])
       filename = effect + str(self.current_frame).zfill(3) + ".npy"
