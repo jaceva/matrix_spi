@@ -55,11 +55,13 @@ def textscroll():
   
   if request.method == "POST":
     text_data = request.json
-    create_text_scroll(text_data["name"],
-                      text_data["scrollText"],
-                      int(text_data["height"]),
-                      int(text_data["top"]),
-                      text_data["font"]
-    )
+    try:
+        create_text_scroll(text_data["name"],
+                        text_data["scrollText"],
+                        int(text_data["height"]),
+                        int(text_data["top"]),
+                        text_data["font"])
+    except Exception as e:
+        print(e)
     
     return jsonify({"status": 200})

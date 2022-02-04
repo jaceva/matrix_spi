@@ -127,7 +127,7 @@ def create_text_scroll(name, text, height, top, font_name="arial.ttf"):
   if txt_name not in data_files:
     txt_dir = f"/home/pi/matrix_spi/data/{txt_name}"
     os.mkdir(txt_dir)
-    os.chown(txt_dir, uid, gid)
+    # os.chown(txt_dir, uid, gid)
     font_size = 1
     text_length = None
     font = ImageFont.truetype(font_name, font_size)
@@ -136,18 +136,18 @@ def create_text_scroll(name, text, height, top, font_name="arial.ttf"):
       font = ImageFont.truetype(font_name, font_size)
 
     text_length = font.getsize(text)[0]
-    text_image = Image.new("RGB", (216+text_length, 36))
+    text_image = Image.new("RGB", (300+text_length, 36))
     draw_image = ImageDraw.Draw(text_image)
     draw_image.text((108, top), text, font=font, fill=(255, 255, 255,))
-    text_image.convert("1")
+    # text_image = text_image.convert("1")
     text_array = np.array(text_image)
-    text_array[text_array==255] = 1
-    # text_array[text_array==0] = -1 
-    # print(temp_array[:,110,:])
-    # text_image.save(f"/home/pi/matrix_spi/data/{txt_name}/{txt_name}.jpg")
+    text_array[text_array >= 32] = 1
+    text_array[text_array < 32] = 0
+
+    text_image.save(f"/home/pi/matrix_spi/thumbs/{txt_name}.jpg")
     frame_total = text_array.shape[1] - 107
-    for f in range(frame_total):
-      np.save(f"/home/pi/matrix_spi/data/{txt_name}/{txt_name}{str(f).zfill(3)}", text_array[:,f:108+f,:])    
+    for f in range(0, frame_total-1, 2):
+      np.save(f"/home/pi/matrix_spi/data/{txt_name}/{txt_name}{str(f//2).zfill(3)}", text_array[:,f:108+f])    
 
 
 if __name__ == "__main__":
@@ -155,5 +155,6 @@ if __name__ == "__main__":
   # e = white_pulse(10)
   # white_up("eff-white-up-fast", 25)
   # create_rgb("pulse-med", 64, pulse)
-  test_frame()
+#   test_frame()
+  create_text_scroll("test", "TESTING", 24, 6)
   

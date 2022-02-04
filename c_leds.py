@@ -84,9 +84,12 @@ class MatrixLEDs():
   def start_spi(self, effect_data):
     
     # next_frame = time.time()
-    self.next_frame(power=effect_data["power"], speed=effect_data["speed"], 
-                    effect=effect_data["effect"], main_level=effect_data["main"],
-                    fg_color= effect_data["fg_color"], bg_color= effect_data["bg_color"], )
+    try:
+        self.next_frame(power=effect_data["power"], speed=effect_data["speed"], 
+                        effect=effect_data["effect"], main_level=effect_data["main"],
+                        fg_color= effect_data["fg_color"], bg_color= effect_data["bg_color"], )
+    except Exception as e:
+        print(e)
     
     if self.frame_thread is not None:
       self.frame_thread.cancel()
@@ -115,11 +118,24 @@ class MatrixLEDs():
       # print(self.frames[self.current_frame])
       filename = effect + str(self.current_frame).zfill(3) + ".npy"
       effect_frame = np.load(f"/home/pi/matrix_spi/data/{effect}/{filename}")
-      effect_frame[:,:,0] = (effect_frame[:,:,0] * fg_color["g"]).astype(np.uint8)
-      effect_frame[:,:,1] = (effect_frame[:,:,1] * fg_color["r"]).astype(np.uint8)
-      effect_frame[:,:,2] = (effect_frame[:,:,2] * fg_color["b"]).astype(np.uint8)
+      file_type = filename[:3]
+      fg_green = fg_color["g"]
+      fg_red = fg_color["r"]
+      fg_blue = fg_color["b"]
+
+      bg_green = bg_color["g"]
+      bg_red = bg_color["r"]
+      bg_blue = bg_color["b"]
+
+    #   if file_type == "rgb":
+      effect_frame[:,:,0] = (effect_frame[:,:,0] * fg_green).astype(np.uint8)
+      effect_frame[:,:,1] = (effect_frame[:,:,1] * fg_red).astype(np.uint8)
+      effect_frame[:,:,2] = (effect_frame[:,:,2] * fg_blue).astype(np.uint8)
       level_divider = 1/main_level if main_level > 0 else 255
       effect_frame = (effect_frame//level_divider).astype(np.uint8)
+    #   elif file_type == "txt":
+    #     effect_frame[effect_frame==True] = np.array([fg_green, fg_red, fg_blue])
+    #     effect_frame[effect_frame==False] = np.array([bg_green, bg_red, bg_blue])
       # print(effect_frame)
       manip_data = bitmanip(effect_frame)
       self.cs_pin.off()
