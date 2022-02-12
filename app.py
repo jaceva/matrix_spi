@@ -27,6 +27,7 @@ def static_proxy(path):
 def effects():
   if request.method == "GET":
     ml.update_main_data()
+    print(ml.effect_names)
     return jsonify({"effects": ml.effect_names})
 
 @app.route('/effect', methods = ['GET', 'POST'])

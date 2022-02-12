@@ -14,6 +14,7 @@ let fgColor;
 let bgColor;
 let fgColorPicker;
 let bgColorPicker;
+let frameCount = 0;
 
 
 function setup() {
@@ -35,18 +36,30 @@ function setup() {
 }
 
 function draw(){
+//   if(frameCount === 40) {
+//     getEffectList();
+//     setTimeout(() => makeButtons(0, 100), 1000);
+//     frameCount = 0;
+//   }
+//   frameCount++;
   makeEffectText(0, 0);
   mainSliderText(250, 0, 250, 100);
   speedSliderText(250, 100, 250, 100);
   fill('black')
-  if(fgColor.levels[0] !== fgColorPicker.color().levels[0] &&
-    fgColor.levels[1] !== fgColorPicker.color().levels[1] &&
+  if(fgColor.levels[0] !== fgColorPicker.color().levels[0] ||
+    fgColor.levels[1] !== fgColorPicker.color().levels[1] ||
     fgColor.levels[2] !== fgColorPicker.color().levels[2]) {
 
     fgColor = fgColorPicker.color();
     toPost = true;
   }
-  bgColor = bgColorPicker.color();
+  if(bgColor.levels[0] !== bgColorPicker.color().levels[0] ||
+    bgColor.levels[1] !== bgColorPicker.color().levels[1] ||
+    bgColor.levels[2] !== bgColorPicker.color().levels[2]) {
+
+    bgColor = bgColorPicker.color();
+    toPost = true;
+  }
 
   let newMain = mainSlide.value();
   if (newMain !== mainLevel) {

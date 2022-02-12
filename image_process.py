@@ -61,8 +61,8 @@ def pulse(step):
   level = 1.0
   step *= -1
   while level >= 0:
-    level = level + step
     frame[:,:,:] = level
+    level = level + step
     yield frame
 
 def create_rgb(name, steps_to_max, effect_function):
@@ -140,10 +140,10 @@ def create_text_scroll(name, text, height, top, font_name="arial.ttf"):
     draw_image = ImageDraw.Draw(text_image)
     draw_image.text((108, top), text, font=font, fill=(255, 255, 255,))
     # text_image = text_image.convert("1")
-    text_array = np.array(text_image)
+    text_array = np.array(text_image, dtype=np.int16)
+    text_array[text_array < 32] = -1
     text_array[text_array >= 32] = 1
-    text_array[text_array < 32] = 0
-
+    print(text_array)
     text_image.save(f"/home/pi/matrix_spi/thumbs/{txt_name}.jpg")
     frame_total = text_array.shape[1] - 107
     for f in range(0, frame_total-1, 2):
@@ -154,7 +154,7 @@ if __name__ == "__main__":
   # convert_image('sparkle.gif')
   # e = white_pulse(10)
   # white_up("eff-white-up-fast", 25)
-  # create_rgb("pulse-med", 64, pulse)
+  create_rgb("pulse-fast", 16, pulse)
 #   test_frame()
-  create_text_scroll("test", "TESTING", 24, 6)
+#   create_text_scroll("test8", "| | | | | | | | ", 30, 0)
   
