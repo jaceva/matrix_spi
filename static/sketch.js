@@ -22,8 +22,8 @@ function setup() {
   background(color(225,225,225));
   
 
-  fgColor = color(255, 0, 0);
-  bgColor = color(0, 255, 0);
+  fgColor = color(255, 255, 255);
+  bgColor = color(0, 0, 0);
 
   makeMainSlider(250,0);
   makeSpeedSlider(250, 100);
@@ -42,6 +42,8 @@ function draw(){
 //     frameCount = 0;
 //   }
 //   frameCount++;
+  getEffectList();
+  setTimeout(() => makeButtons(0, 100), 1000);
   makeEffectText(0, 0);
   mainSliderText(250, 0, 250, 100);
   speedSliderText(250, 100, 250, 100);

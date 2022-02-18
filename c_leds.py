@@ -22,7 +22,7 @@ class MatrixLEDs():
     self.prev_effect = ''
 
     # next frame vars
-    self.seconds_per_refresh = 0.030
+    self.seconds_per_refresh = 0.050
     self.frames = []
     self.current_frame = 0
     self.refresh_count = 0
@@ -125,7 +125,7 @@ class MatrixLEDs():
       bg_green = bg_color["g"]
       bg_red = bg_color["r"]
       bg_blue = bg_color["b"]
-      print(fg_green, fg_red, fg_blue)
+    #   print(fg_green, fg_red, fg_blue)
       effect_frame[:,:,0][effect_frame[:,:,0] > 0] *= fg_green
       effect_frame[:,:,1][effect_frame[:,:,1] > 0] *= fg_red
       effect_frame[:,:,2][effect_frame[:,:,2] > 0] *= fg_blue
