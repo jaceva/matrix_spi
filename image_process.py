@@ -149,12 +149,18 @@ def create_text_scroll(name, text, height, top, font_name="arial.ttf"):
     for f in range(0, frame_total-1, 2):
       np.save(f"/home/pi/matrix_spi/data/{txt_name}/{txt_name}{str(f//2).zfill(3)}", text_array[:,f:108+f])    
 
+def create_static():
+    static_array = np.ones((36, 108, 3), dtype=np.uint8)
+    os.mkdir(f"/home/pi/matrix_spi/data/rgb-static")
+    np.save(f"/home/pi/matrix_spi/data/rgb-static/rgb-static000", static_array) 
+
 
 if __name__ == "__main__":
   # convert_image('sparkle.gif')
   # e = white_pulse(10)
   # white_up("eff-white-up-fast", 25)
-  create_rgb("pulse-fast", 16, pulse)
+#   create_rgb("pulse-fast", 16, pulse)
 #   test_frame()
 #   create_text_scroll("test8", "| | | | | | | | ", 30, 0)
+  create_static()
   
