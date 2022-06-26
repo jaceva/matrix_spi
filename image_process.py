@@ -3,11 +3,11 @@ import ffmpeg
 import numpy as np
 import pickle
 import os
-import pwd
-import grp
+# import pwd
+# import grp
 
-uid = pwd.getpwnam("pi").pw_uid
-gid = grp.getgrnam("www-data").gr_gid
+# uid = pwd.getpwnam("pi").pw_uid
+# gid = grp.getgrnam("www-data").gr_gid
 
 # ffmepeg to covert images(gifs?) to the right size numpy array
 # TODO needs testing
@@ -154,6 +154,27 @@ def create_static():
     os.mkdir(f"/home/pi/matrix_spi/data/rgb-static")
     np.save(f"/home/pi/matrix_spi/data/rgb-static/rgb-static000", static_array) 
 
+def create_pride():
+    pride_array = frame = get_full_image(np.half)
+    red = [1, 0, 0]
+    orange = [1,0.65, 0]
+    yellow = [1,1,0]
+    green = [0,1,0]
+    blue = [0,0,1]
+    purple = [0.5, 0, 0.5]
+    
+    pride_array[0:6, :] = red
+    pride_array[6:12, :] = orange
+    pride_array[12:18, :] = yellow
+    pride_array[18:24, :] = green
+    pride_array[24:30, :] = blue
+    pride_array[30:36, :] = purple
+    
+    for i in range(36):
+      print(pride_array[i])
+    os.mkdir(f"/home/pi/matrix_spi/data/rgb-pride")
+    np.save(f"/home/pi/matrix_spi/data/rgb-pride/rgb-pride000", pride_array) 
+
 
 if __name__ == "__main__":
   # convert_image('sparkle.gif')
@@ -162,5 +183,6 @@ if __name__ == "__main__":
 #   create_rgb("pulse-fast", 16, pulse)
 #   test_frame()
 #   create_text_scroll("test8", "| | | | | | | | ", 30, 0)
-  create_static()
+  # create_static()
+  create_pride()
   
