@@ -156,12 +156,12 @@ def create_static():
 
 def create_pride():
     pride_array = frame = get_full_image(np.half)
-    red = [1, 0, 0]
-    orange = [1,0.65, 0]
+    red = [0, 1, 0]
+    orange = [0.65,1, 0]
     yellow = [1,1,0]
-    green = [0,1,0]
+    green = [1,0,0]
     blue = [0,0,1]
-    purple = [0.5, 0, 0.5]
+    purple = [0, 0.5, 0.5]
     
     pride_array[0:6, :] = red
     pride_array[6:12, :] = orange
@@ -172,8 +172,8 @@ def create_pride():
     
     for i in range(36):
       print(pride_array[i])
-    os.mkdir(f"/home/pi/matrix_spi/data/rgb-pride")
-    np.save(f"/home/pi/matrix_spi/data/rgb-pride/rgb-pride000", pride_array) 
+    os.mkdir(f"/home/pi/matrix_spi/data/rgb-pride2")
+    np.save(f"/home/pi/matrix_spi/data/rgb-pride/rgb-pride2000", pride_array) 
 
 
 if __name__ == "__main__":
