@@ -1,276 +1,652 @@
-let effData;
-let rgbData;
-let powerButton;
-let mainSlide;
-let speedSlide;
-let powerData = 1;
-let speedData = 5;
-let effect = "rgb-pulse-slow";
-let effectName = "Pulse Slow";
-let row = 90;
-let mainLevel = 100;
-let toPost = false;
-let fgColor;
-let bgColor;
-let fgColorPicker;
-let bgColorPicker;
-let frameCount = 0;
+let state = {
+  effect_id: 'rgb-test-frame',
+  bright: 100,
+  speed: 100,
+  // fg_color: {'r': 255, 'g': 255, 'b': 255},
+  // bg_color: {'r': 0, 'g': 0, 'b': 0},
+  fg_color: [255, 255, 255],
+  bg_color: [0, 0, 0],
+};
 
+let labels = {
+  bright: 'Brightness',
+  speed: 'Speed',
+  fg_color: 'Foreground Color',
+  bg_color: 'Background Color',
+}
+let effectButton;
+let inp;
+let slider;
+// let bright = 100;
+let listBox;
+let controlPosition = 0;
+let panePosition = 0;
+
+const ASPECT_RATIO = 1.33;
+let pageWidth;
+let pageHeight;
+
+let controls = {};
+let effects = undefined;
+let cues = [];
 
 function setup() {
-  createCanvas(1920, 1080);
-  background(color(225,225,225));
-  
+  frameRate(2);
+  createCanvas(windowWidth, windowHeight);
 
-  fgColor = color(255, 255, 255);
-  bgColor = color(0, 0, 0);
-
-  makeMainSlider(250,0);
-  makeSpeedSlider(250, 100);
-  makeFGColorPicker(500, 0);
-  makeBGColorPicker(500, 100);
-  makeTextScroll(250, 200);
-  
-  getEffectList();
-  setTimeout(() => makeButtons(0, 100), 1000);
+  getEffects(drawControls);
 }
 
-function draw(){
-//   if(frameCount === 40) {
-//     getEffectList();
-//     setTimeout(() => makeButtons(0, 100), 1000);
-//     frameCount = 0;
+function draw() {
+  // displayEffects()
+  // console.log(state['bright']);
+}
+
+function updateState(stateVar) {
+  state[stateVar] = controls[stateVar].value();
+  postState();
+}
+
+class ColorPickerControl {
+  constructor(prompt, x, y, width, height, changeFunction) {
+    this.prompt = prompt;
+    this.colorPicker = createColorPicker(255, 255, 255);
+
+    this.changed(changeFunction);
+    this.draw(x, y, width-10, height);
+  }
+
+  remove() {
+    this.colorPicker.remove();
+  }
+
+  changed(changeFunction) {
+    this.colorPicker.changed(() => {
+      changeFunction();
+      // this.draw();
+    })
+    this.draw();
+    console.log(this.value());
+  }
+
+  value(newValue) {
+    if(newValue === undefined) {
+      return this.colorPicker.value();
+    }
+    this.colorPicker.value(newValue);
+    this.draw();
+  }
+
+  draw(x=this.x, y=this.y, width=this.width, height=this.height) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;  
+
+    this.drawBackground();
+    this.drawColorPicker();
+    this.drawPrompt();
+  }
+
+  drawBackground() {
+    fill("#ffffff");
+    noStroke();
+    rect(this.x, this.y, this.width-20, this.height)
+  }
+
+  drawPrompt() {
+    let promptY = this.y + (this.height * 0.1);
+    fill('#000000')
+    textSize(18)
+    text(`${this.prompt}: ${this.colorPicker.value()}`, this.x, promptY);
+  }
+
+  drawColorPicker() {
+    let colorPickerY = this.y + (this.height * 0.25);
+
+    this.colorPicker.position(this.x, colorPickerY);
+    this.colorPicker.style('width', this.width - 10);
+    this.colorPicker.style('height', this.height * 0.6);
+  }
+}
+
+class SliderControl {
+  constructor(prompt, x, y, width, height, changeFunction) {
+    this.prompt = prompt;
+    this.slider = createSlider(0, 100, 100, 1);
+
+    this.changed(changeFunction)
+    this.draw(x, y+10, width-30, height);
+  }
+
+  remove() {
+    this.slider.remove();
+  }
+
+  changed(changeFunction) {
+    this.slider.changed(() => {
+      changeFunction()
+      // this.draw()
+    })
+    this.draw();
+    console.log(this.value());
+  }
+
+  value(newValue) {
+    if(newValue === undefined) {
+      return this.slider.value();
+    }
+    this.slider.value(newValue);
+    this.draw();
+  }
+
+  draw(x=this.x, y=this.y, width=this.width, height=this.height) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;  
+
+    this.drawBackground();
+    this.drawSlider();
+    this.drawPrompt();
+  }
+
+  drawBackground() {
+    fill("#ffffff");
+    noStroke();
+    rect(this.x, this.y, this.width, this.height)
+  }
+
+  drawPrompt() {
+    let promptY = this.y + (this.height * 0.25);
+    fill('#000000')
+    textSize(18)
+    text(`${this.prompt}: ${this.slider.value()}`, this.x, promptY);
+  }
+
+  drawSlider() {
+    let sliderY = this.y + (this.height * 0.5);
+    this.slider.position(this.x, sliderY)
+    this.slider.style('width', this.width);
+  }
+}
+
+// Show preview thumb(s) of effect
+// how to integrate color
+// class PreviewControl {
+//   constructor(prompt, items, x, y, width, height, changeFunction) {
+//     this.prompt = prompt;
+//     this.items = items;
+//     // this.listBox = createSelect();
+
+//     this.changed(changeFunction)
+//     this.draw(x, y+10, width, height);
 //   }
-//   frameCount++;
-  getEffectList();
-  setTimeout(() => makeButtons(0, 100), 1000);
-  makeEffectText(0, 0);
-  mainSliderText(250, 0, 250, 100);
-  speedSliderText(250, 100, 250, 100);
-  fill('black')
-  if(fgColor.levels[0] !== fgColorPicker.color().levels[0] ||
-    fgColor.levels[1] !== fgColorPicker.color().levels[1] ||
-    fgColor.levels[2] !== fgColorPicker.color().levels[2]) {
 
-    fgColor = fgColorPicker.color();
-    toPost = true;
-  }
-  if(bgColor.levels[0] !== bgColorPicker.color().levels[0] ||
-    bgColor.levels[1] !== bgColorPicker.color().levels[1] ||
-    bgColor.levels[2] !== bgColorPicker.color().levels[2]) {
-
-    bgColor = bgColorPicker.color();
-    toPost = true;
-  }
-
-  let newMain = mainSlide.value();
-  if (newMain !== mainLevel) {
-    mainLevel = newMain;
-    
-    toPost = true;
-  }
-  let newSpeed = speedSlide.value();
-  if (newSpeed !== speedData) {
-    speedData = newSpeed;
-    
-    toPost = true;
-  }
-  if(toPost) {
-    toPost = false
-    postData();
-  }
-}
-
-function drawBorder(x, y, w, h) {
-  noFill()
-  rect(x+10, y+10, w-10, h-10);
-}
-
-function makeGif(x, y) {
-  w = 500; 
-  h = 100;
-  drawBorder(x, y, w, h)
-  fill(63,63,63);
-  textSize(24);
-  text('GIF Creation', x+20, y+35);
-  textSize(12);
-
-  text('GIF URL:', x+20, y+65);
-  let gifUrl = createInput('');
-  gifUrl.position(x+100, y+55);
-  gifUrl.size(150);
-
-  let textSubmit = createButton("Submit");
-  textSubmit.position(x+30, y+130);
-  textSubmit.style('width', '465px')
-  textSubmit.style('height', '40px')
-  textSubmit.mousePressed(() => {
-    postGifUrl(gifUrl.value(),);
-  });
-}
-
-function makeTextScroll(x, y) {
-  w = 500; 
-  h = 175;
-  drawBorder(x, y, w, h)
-  fill(63,63,63);
-  textSize(24);
-  text('Text Scroll Creation', x+20, y+35);
-  textSize(12);
-
-  text('Effect Name:', x+20, y+65);
-  let effName = createInput('');
-  effName.position(x+100, y+55);
-  effName.size(150);
-
-  text('Font:   Arial', x+250, y+65);
-
-  text('Text Pixel Height:', x+20, y+90);
-  let pixelHeight = createInput('');
-  pixelHeight.position(x+123, y+80);
-  pixelHeight.size(30);
+//   remove() {
+//     console.log("PreviewControl remove() - Not implemented")
+//   }
   
-  text('Pixels From Top:', x+150, y+90);
-  let pixelTop = createInput('');
-  pixelTop.position(x+250, y+80);
-  pixelTop.size(30);
+//   updateItems(items) {
+//     this.items = items;
+//     this.draw();
+//   }
 
-  text('Text:', x+20, y+115);
-  let scrollText = createInput('');
-  scrollText.position(x+70, y+105);
-  scrollText.size(420);
+//   changed(changeFunction) {
+//     this.listBox.changed(() => {
+//       changeFunction()
+//       // this.draw()
+//     })
+//     this.draw();
+//     console.log(this.value());
+//   }
 
-  let urlSubmit = createButton("Submit");
-  urlSubmit.position(x+30, y+130);
-  urlSubmit.style('width', '465px')
-  urlSubmit.style('height', '40px')
-  urlSubmit.mousePressed(() => {
-    postTextScroll(effName.value(), scrollText.value(), 
-                  "DejaVuSans", pixelHeight.value(), pixelTop.value());
-  });
-}
+//   value(newValue) {
+//     if(newValue === undefined) {
+//       return this.listBox.value();
+//     }
+//     this.listBox.value(newValue);
+//     this.draw();
+//   }
 
-function makeEffectText(x, y) {
-  w = 250; 
-  h = 100;
-  fill(225,225,225);
-  rect(x+5, y+5, w-5, h-5)
-  drawBorder(x, y, w, h)
-  fill(63,63,63)
-  textSize(32);
-  text('Current Effect', x+20, y+40);
-  textSize(24);
-  text(effectName, x+20, y+80);
-}
+//   draw(x=this.x, y=this.y, width=this.width, height=this.height) {
+//     this.x = x;
+//     this.y = y;
+//     this.width = width;
+//     this.height = height;  
 
-function mainSliderText(x, y, w, h) {
-  fill(225,225,225);
-  rect(x+5, y+5, w-5, h-5)
-  fill(63,63,63);
-  textSize(32);
-  text(`Brightness: ${mainLevel}`, x+20, y+40);
-}
+//     this.drawBackground();
+//     this.drawPreview();
+//     this.drawPrompt();
+//     this.drawControls();
+//   }
 
-function makeMainSlider(x, y) {
-  w = 250; 
-  h = 100;
-  drawBorder(x, y, w, h)
-  mainSliderText(x, y, w, h)
-  mainSlide = createSlider(0, 100, mainLevel, 1);
-  mainSlide.position(x+20, y+80);
-  mainSlide.style('width', '230px');
-}
+//   drawBackground() {
+//     fill("#ffffff");
+//     noStroke();
+//     rect(this.x, this.y, this.width, this.height)
+//   }
 
-function speedSliderText(x, y, w, h) {
-  fill(225,225,225);
-  rect(x+5, y+5, w-5, h-5)
-  fill(63,63,63);
-  textSize(32);
-  text(`Speed: ${speedData}`, x+20, y+40);
-}
+//   drawPrompt() {
+//     let promptY = this.y + (this.height * 0.05);
+//     fill('#000000')
+//     textSize(18)
+//     // TODO: add frames and current frame
+//     text(`${this.prompt}`, this.x, promptY);
+//   }
 
-function makeSpeedSlider(x, y) {
-  w = 250; 
-  h = 100;
-  drawBorder(x, y, w, h)
-  speedSliderText(x, y, w, h)
-  speedSlide = createSlider(1, 10, speedData, 1);
-  speedSlide.position(x+20, y+80);
-  speedSlide.style('width', '230px');
-}
+//   drawPreview() {
+//     let previewY = this.y + (this.height * 0.10);
+//     console.log("Preview - Draw Preview Not Implemented");
+//   }
 
-function makeFGColorPicker(x, y) { 
-  w = 250; 
-  h = 100;
-  drawBorder(x, y, w, h);
-  fill(63,63,63);
-  textSize(24);
-  text('Foreground Color', x+20, y+35);
-  fgColorPicker = createColorPicker(fgColor);
-  fgColorPicker.position(x+25, y+50);
-  fgColorPicker.style('height', '50px');
-  fgColorPicker.style('width', '230px');
-}
+//   drawControls() {
+//     console.log("Preview - Draw Controls Not Implemented");
+//     // enable/disable preview checkbox
+//     // pause/start effect
+//     // prev/next frame
+//   }
+// }
 
-function makeBGColorPicker(x, y) {
-  w = 250; 
-  h = 100;
-  drawBorder(x, y, w, h);
-  fill(63,63,63);
-  textSize(24);
-  text('Background Color', x+20, y+35);
-  bgColorPicker = createColorPicker(bgColor);
-  bgColorPicker.position(x+25, y+50);
-  bgColorPicker.style('height', '50px');
-  bgColorPicker.style('width', '230px');
-}
-
-function makeButtons(x, y) {
-  w = 250
-  h = 23
-
-  for(let eff in effData) {
-    b = createButton(effData[eff]);
-    b.position(x+23, y+h);
-    b.style('width', '230px')
-    b.style('height', '25px')
-    b.mousePressed(() => {
-      effect = eff;
-      effectName = effData[eff];
-      postData()
+class ListControl {
+  constructor(prompt, items, nameKey, x, y, width, height, changeFunction) {
+    this.prompt = prompt;
+    this.items = items;
+    this.listBox = createSelect();
+    Object.values(this.items).forEach(element => {
+      this.listBox.option(element);
     });
-    h += 30;
+
+    this.changed(changeFunction)
+    this.draw(x, y+10, width, height);
   }
-  drawBorder(x, y, w, h-7);
+  
+  remove() {
+    this.listBox.remove();
+  }
+  
+  getKey(value) {
+    for (const key in this.items) {
+      if (this.items[key] === value) {
+        return key
+      }
+    }
+    return undefined;
+  }
+
+  updateItems(items) {
+    this.items = items;
+    this.draw();
+  }
+
+  changed(changeFunction) {
+    this.listBox.changed(() => {
+      changeFunction()
+      this.draw()
+    })
+    this.draw();
+  }
+
+  value(newValue) {
+    if(newValue === undefined) {
+      return this.getKey(this.listBox.value());
+    }
+
+    // TODO test this works
+    this.listBox.value(newValue);
+    this.draw();
+  }
+
+  draw(x=this.x, y=this.y, width=this.width, height=this.height) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;  
+
+    this.drawBackground();
+    this.drawListBox();
+    this.drawPrompt();
+  }
+
+  drawBackground() {
+    fill("#ffffff");
+    noStroke();
+    rect(this.x, this.y, this.width, this.height)
+  }
+
+  drawPrompt() {
+    let promptY = this.y + (this.height * 0.05);
+    fill('#000000')
+    textSize(18)
+    text(`${this.prompt}`, this.x, promptY);
+  }
+
+  drawListBox() {
+    let listBoxY = this.y + (this.height * 0.1);
+    this.listBox.position(this.x, listBoxY);
+    this.listBox.style('width', this.width);
+    this.listBox.style('height', this.height * 0.9);
+    this.listBox.attribute('multiple', 'multiple')
+  }
 }
 
-function postTextScroll(name, scrollText, font, height, top) {
-  console.log(name)
-  httpPost("/textscroll", 'json', {'name': name, 
-                              'scrollText': scrollText, 
-                              'font': font, 
-                              'height': height,
-                              'top': top,}
-  )}
+class ButtonControl {
+  constructor(prompt, x, y, width, height, changeFunction) {
+    this.prompt = prompt;
+    this.button = createButton(this.prompt);
 
-function postData() { 
-  // console.log(effect);
-  httpPost("/effect", 'json', {'power': powerData, 
-                              'speed': speedData, 
-                              'effect': effect, 
-                              'main': mainLevel,
-                              'fg_color': {'r': fgColor.levels[0],
-                                          'g': fgColor.levels[1],
-                                          'b': fgColor.levels[2],},
-                              'bg_color': {'r': bgColor.levels[0],
-                                          'g': bgColor.levels[1],
-                                          'b': bgColor.levels[2],},
-                            });
+    this.button.mousePressed(changeFunction);
+    this.draw(x, y+10, width, height);
+  }
+  
+  remove() {
+    this.button.remove();
+  }
+
+  draw(x=this.x, y=this.y, width=this.width, height=this.height) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;  
+
+    this.drawBackground();
+    this.drawListBox();
+    // this.drawPrompt();
+  }
+
+  drawBackground() {
+    fill("#ffffff");
+    noStroke();
+    rect(this.x, this.y, this.width, this.height)
+  }
+
+  drawPrompt() {
+    let promptY = this.y + (this.height * 0.05);
+    fill('#000000')
+    textSize(18)
+    text(`${this.prompt}`, this.x, promptY);
+  }
+
+  drawListBox() {
+    let buttonY = this.y;
+    this.button.position(this.x, buttonY);
+    this.button.style('width', this.width);
+    this.button.style('height', this.height);
+  }
 }
 
-function getEffectList() {
-  httpGet("/effects", "json", false, (x) => {
-    effData = x['effects'];
-    console.log(effData);
+// Line 1: Effect Name bolded center
+// Line 2: fg color, bf color
+
+class CurrentEffectControl {
+  constructor(prompt, current_effect, x, y, width, height, changeFunction) {
+    this.prompt = prompt;
+    this.currentEffect = currentEffect;
+
+    this.draw(x, y+10, width, height);
+  }
+  
+  value(newValue) {
+    if(newValue === undefined) {
+      return this.currentEffect;
+    }
+    this.currentEffect = newValue;
+    this.draw();
+  }
+
+  remove() {
+    ;
+  }
+
+  draw(x=this.x, y=this.y, width=this.width, height=this.height) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;  
+
+    this.drawBackground();
+    // this.drawListBox();
+    // this.drawPrompt();
+  }
+
+  drawBackground() {
+    fill("#ffffff");
+    noStroke();
+    rect(this.x, this.y, this.width, this.height)
+  }
+
+  drawPrompt() {
+    let promptY = this.y + (this.height * 0.05);
+    fill('#000000')
+    textSize(18)
+    text(`${this.prompt}`, this.x, promptY);
+  }
+
+  drawListBox() {
+    let buttonY = this.y;
+    this.button.position(this.x, buttonY);
+    this.button.style('width', this.width);
+    this.button.style('height', this.height);
+  }
+}
+
+function setEffect() {
+  effect = controls['effect_list'].value()
+  // controls['current_effect'].value(effect)
+  
+  console.log(`${effect}: NOT IMPLEMENTED need current_effect control`);
+}
+
+function cueNext() {
+
+  cues = [{
+    effect_id: controls['effect_list'].value(),
+    bright: controls['bright'].value(),
+    speed: controls['speed'].value(),
+    fg_color: controls['fg_color'].value(),
+    bg_color: controls['bg_color'].value(),
+  }, ...cues];
+
+
+  console.log(cues);
+  // get effect list value
+  // put at top of cue list
+
+}
+
+function cuePosition() {
+  // get effect list value
+  // put at location of cue list
+}
+
+function cueLast() {
+  // get effect list value
+  // put at end of cue list
+}
+
+function prevCue() {
+  // highlight prev cue
+}
+
+function nextCue() {
+  // highlight next cue
+}
+
+function playPauseCue() {
+  // stop the wall at current frame
+  // POST data
+}
+
+function shiftUpCue() {
+  // move selected cue up one
+}
+
+function shiftDownCue() {
+  // move selected cue down one
+}
+
+function deleteCue() {
+  // toggle delete cue button
+}
+
+function confirmDeleteCue() {
+  // delete selected from cuelist
+  // change delete cue status
+}
+
+
+
+function drawControls() {
+  Object.values(controls).forEach(control => {
+    control.remove();
+  });
+  noStroke()
+  rect(0, 0, windowWidth, windowHeight)
+  panePosition = 0;
+  let tempWidth = windowHeight / ASPECT_RATIO;
+  
+  if (tempWidth > windowWidth) {
+    pageWidth = windowWidth - 25;
+    pageHeight = int(windowHeight * ASPECT_RATIO) -25;
+  } else {
+    pageWidth = int(tempWidth);
+    pageHeight = int(windowHeight) - 25;
+  }
+  drawTopController();
+  drawEffectController();
+  drawCueController();
+}
+
+function drawBorder(heightPercentage) {
+  fill('#ffffff');
+  stroke('#000000')
+  controlHeight = int(pageHeight * heightPercentage)
+  // console.log(controlHeight, panePosition);
+  strokeWeight(4);
+  rect(0, panePosition, pageWidth, controlHeight);
+  // panePosition += controlHeight;
+
+  return controlHeight;
+}
+
+function drawTopController() {
+  let heightPercentage = 0.3;
+  controlHeight = drawBorder(heightPercentage);
+  controlPosition = panePosition;
+  panePosition += controlHeight;
+
+  brightHeight = int(controlHeight * 0.25)
+  speedHeight = int(controlHeight * 0.25)
+  colorHeight = int(controlHeight * 0.5)
+  
+  controls['bright'] = new SliderControl(labels['bright'], 20, controlPosition, pageWidth, brightHeight, () => updateState('bright'));
+  controlPosition += brightHeight;
+  controls['speed'] = new SliderControl(labels['speed'], 20, controlPosition, pageWidth, speedHeight, () => updateState('speed'));
+  controlPosition += speedHeight;
+  controls['fg_color'] = new ColorPickerControl(labels['fg_color'], 20, controlPosition, pageWidth/2, colorHeight, () => updateState('fg_color'));
+  controls['bg_color'] = new ColorPickerControl(labels['bg_color'], pageWidth/2, controlPosition, pageWidth/2, colorHeight, () => updateState('bg_color'));
+
+  // return controlPosition;
+}
+
+function drawEffectController() {
+  let heightPercentage = 0.35;
+
+  controlWidth = pageWidth;
+  controlHeight = drawBorder(heightPercentage);
+  controlPosition = panePosition;
+  panePosition += controlHeight;
+  
+  listWidth = int(controlWidth * 0.33);
+  listHeight = int(controlHeight * 0.7);
+
+  previewWidth = int(controlWidth * 0.67);
+  previewHeight = int(controlHeight * 0.7);
+
+  buttonWidth = int(controlWidth / 4.15);
+  buttonHeight = int(controlHeight * 0.25);
+  
+
+  controls['effect_list'] = new ListControl('Effects', effects, 20, controlPosition, listWidth, listHeight, () => {console.log("List Changed!")});
+  
+  controlPosition += listHeight;
+  controls['set_effect'] = new ButtonControl('Set Effect', (0 * buttonWidth) + 20, controlPosition + 5, buttonWidth, buttonHeight, setEffect);
+  controls['cue_next'] = new ButtonControl('Cue Next', (1 * buttonWidth) + 20, controlPosition + 5, buttonWidth, buttonHeight, cueNext);
+  controls['cue_position'] = new ButtonControl('Cue Position', (2 * buttonWidth) + 20, controlPosition + 5, buttonWidth, buttonHeight, () => {console.log("Set Now")});
+  controls['cue_last'] = new ButtonControl('Cue Last', (3 * buttonWidth) + 20, controlPosition + 5, buttonWidth, buttonHeight, () => {console.log("Set Now")});
+
+
+  // drawEffectPreview();
+  // drawEffectController();
+
+  // return controlPosition;
+}
+
+function drawCueController() {
+  let heightPercentage = 0.35;
+
+  controlWidth = pageWidth;
+  controlHeight = drawBorder(heightPercentage);
+  controlPosition = panePosition;
+  panePosition += controlHeight;
+  
+  listWidth = int(controlWidth * 0.33);
+  listHeight = int(controlHeight * 0.95);
+
+
+  effectWidth = int(controlWidth * 0.67);
+  effectHeight = int(controlHeight * 0.25);
+
+  buttonWidth = int((controlWidth * 0.66) / 3.15);
+  shortButtonHeight = int(controlHeight * 0.23);
+  tallButtonHeight = int(controlHeight * 0.46);
+
+  controls['cue_list'] = new ListControl('Cue List', cues, 20, controlPosition, listWidth, listHeight, () => {console.log("List Changed!")});
+  // controls['current_effect']
+  controlPosition += effectHeight;
+  controls['prev'] = new ButtonControl('<<<', listWidth + (0 * buttonWidth) + 20, controlPosition + 5, buttonWidth, shortButtonHeight, () => {console.log("Set Now")});
+  controls['next'] = new ButtonControl('>>>', listWidth + (1 * buttonWidth) + 20, controlPosition + 5, buttonWidth, shortButtonHeight, () => {console.log("Set Now")});
+  controls['play_pause'] = new ButtonControl('Play/Pause', listWidth + (2 * buttonWidth) + 20, controlPosition + 5, buttonWidth, shortButtonHeight, () => {console.log("Set Now")});
+  
+  controlPosition += shortButtonHeight;
+  controls['shift_up'] = new ButtonControl('Shift Up', listWidth + (0 * buttonWidth) + 20, controlPosition + 5, buttonWidth, shortButtonHeight, () => {console.log("Set Now")});
+  controls['delete'] = new ButtonControl('Delete', listWidth + (1 * buttonWidth) + 20, controlPosition + 5, buttonWidth, shortButtonHeight, () => {console.log("Set Now")});
+  controls['go'] = new ButtonControl('GO', listWidth + (2 * buttonWidth) + 20, controlPosition + 5, buttonWidth, tallButtonHeight, () => {console.log("Set Now")});
+  
+  controlPosition += shortButtonHeight;
+  controls['shift_down'] = new ButtonControl('Shift Down', listWidth + (0 * buttonWidth) + 20, controlPosition + 5, buttonWidth, shortButtonHeight, () => {console.log("Set Now")});
+  controls['confirm_delete'] = new ButtonControl('CONFIRM DELETE', listWidth + (1 * buttonWidth) + 20, controlPosition + 5, buttonWidth, shortButtonHeight, () => {console.log("Set Now")});
+ 
+
+}
+
+function windowResized() {
+  // console.log(windowWidth, windowHeight);
+  
+  //createCanvas(windowWidth, windowHeight);
+  drawControls();
+}
+
+function getEffects(afterFunction = () => {}) {
+  httpGet("/effects", "json", false, (e) => {
+    effects = {...e['effects']};
+    // console.log(effects);
+    // console.log(Object.values(effects));
+    afterFunction()
+  })
+}
+
+// function getState() {
+//   httpGet("/state", "json", false, (s) => {
+//     state = s;
+//     console.log(state);
+//   })
+// }
+
+function postState() {
+  // updateState()
+  httpPost("/state", "json", state, (response) => {
+    state = response['state']
+    // console.log(state)
   })
 }
