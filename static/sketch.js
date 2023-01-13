@@ -72,7 +72,7 @@ class ColorPickerControl {
 
   value(newValue) {
     if(newValue === undefined) {
-      return this.colorPicker.value();
+      return color(this.colorPicker.value()).levels.slice(0,3);
     }
     this.colorPicker.value(newValue);
     this.draw();

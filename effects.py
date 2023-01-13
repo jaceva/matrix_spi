@@ -36,7 +36,7 @@ class EffectManager():
     print("get_effect")
 
     # TODO does this need to be here
-    # self.load_effects()
+    self.load_effects()
     return self.effects[identifier]
 
   def output_effects(self):
