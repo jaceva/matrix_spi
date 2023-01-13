@@ -1,6 +1,6 @@
 {
   "cs_pin": 5,
-  "effect_id": "rgb-square-vortex",
+  "effect_id": "rgb-test-scroll",
   "speed": 100,
   "bright": 100,
   "fg_color": [255, 255, 255],
