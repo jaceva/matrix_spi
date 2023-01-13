@@ -1,0 +1,8 @@
+{
+  "cs_pin": 5,
+  "effect_id": "rgb-square-vortex",
+  "speed": 100,
+  "bright": 100,
+  "fg_color": [255, 255, 255],
+  "bg_color": [0, 0, 0]
+}
