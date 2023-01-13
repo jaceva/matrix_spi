@@ -65,7 +65,7 @@ class MatrixLeds():
       'effect_id': self.effect.identifier,
       'effect_name': self.effect.name,
       'speed': self.speed,
-      'bright': self.bright,
+      'bright': self.bright * 100,
       'fg_color': self.fg_color,
       'bg_color': self.bg_color,
     }

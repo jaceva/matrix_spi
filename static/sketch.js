@@ -653,6 +653,6 @@ function postState() {
   // updateState()
   httpPost("/state", "json", state, (response) => {
     state = response['state']
-    // console.log(state)
+    console.log(state)
   })
 }
