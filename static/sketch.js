@@ -35,7 +35,7 @@ function setup() {
   frameRate(2);
   createCanvas(windowWidth, windowHeight);
 
-  getEffects(drawControls);
+  getEffects(() => getState(drawControls));
 }
 
 function draw() {
@@ -638,16 +638,18 @@ function getEffects(afterFunction = () => {}) {
 
     // console.log(effects);
     // console.log(Object.values(effects));
-    afterFunction()
+    afterFunction();
   })
 }
 
-// function getState() {
-//   httpGet("/state", "json", false, (s) => {
-//     state = s;
-//     console.log(state);
-//   })
-// }
+function getState(afterFunction = () => {}) {
+  httpGet("/state", "json", false, (s) => {
+    state = {...s['state']};
+    console.log(state);
+  })
+
+  afterFunction();
+}
 
 function postState() {
   // updateState()

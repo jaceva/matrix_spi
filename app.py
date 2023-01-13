@@ -44,9 +44,14 @@ def effects():
   #   })
 
 # TODO update active effect with post?
-@app.route("/state", methods = ["POST"])
+@app.route("/state", methods = ["GET", "POST"])
 def set_state():
   '''Set effect and '''
+  if request.method == "GET":
+    return {
+        "success": True,
+        "state": matrix.get_data()
+      }
   if request.method == "POST":
     state = request.json
     try:
