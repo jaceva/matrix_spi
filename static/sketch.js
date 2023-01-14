@@ -49,9 +49,9 @@ function updateState(stateVar) {
 }
 
 class ColorPickerControl {
-  constructor(prompt, x, y, width, height, changeFunction) {
+  constructor(prompt, color, x, y, width, height, changeFunction) {
     this.prompt = prompt;
-    this.colorPicker = createColorPicker(255, 255, 255);
+    this.colorPicker = createColorPicker(color);
 
     this.changed(changeFunction);
     this.draw(x, y, width-10, height);
@@ -63,11 +63,10 @@ class ColorPickerControl {
 
   changed(changeFunction) {
     this.colorPicker.changed(() => {
+      this.draw();
       changeFunction();
       // this.draw();
     })
-    this.draw();
-    console.log(this.value());
   }
 
   value(newValue) {
@@ -99,7 +98,8 @@ class ColorPickerControl {
     let promptY = this.y + (this.height * 0.1);
     fill('#000000')
     textSize(18)
-    text(`${this.prompt}: ${this.colorPicker.value()}`, this.x, promptY);
+    // console.log(this.value())
+    text(`${this.prompt}: R: ${this.value()[0]} G: ${this.value()[1]} B: ${this.value()[2]}`, this.x, promptY);
   }
 
   drawColorPicker() {
@@ -545,8 +545,8 @@ function drawTopController() {
   controlPosition += brightHeight;
   controls['speed'] = new SliderControl(labels['speed'], 20, controlPosition, pageWidth, speedHeight, () => updateState('speed'));
   controlPosition += speedHeight;
-  controls['fg_color'] = new ColorPickerControl(labels['fg_color'], 20, controlPosition, pageWidth/2, colorHeight, () => updateState('fg_color'));
-  controls['bg_color'] = new ColorPickerControl(labels['bg_color'], pageWidth/2, controlPosition, pageWidth/2, colorHeight, () => updateState('bg_color'));
+  controls['fg_color'] = new ColorPickerControl(labels['fg_color'], "#ffffff", 20, controlPosition, pageWidth/2, colorHeight, () => updateState('fg_color'));
+  controls['bg_color'] = new ColorPickerControl(labels['bg_color'], "#000000", pageWidth/2, controlPosition, pageWidth/2, colorHeight, () => updateState('bg_color'));
 
   // return controlPosition;
 }
